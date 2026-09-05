@@ -4,6 +4,12 @@ A watchlist that doesn't just show you stock prices — it remembers what you
 saw last time, tells you what actually changed, and ranks what deserves your
 attention right now.
 
+**Live Demo:** https://smart-watchlist-by-samiksha.vercel.app
+
+(Note: The backend runs on a free hosting tier that sleeps after periods of
+inactivity. If the app feels stuck or slow on your first click, give it
+30-50 seconds to wake up, that's expected, not a bug.)
+
 ## The problem with a normal watchlist
 
 Every broker app shows you: symbol, price, today's % change. That's it. You
@@ -118,7 +124,13 @@ the ID is obtained, not how anything downstream uses it.
 - **Push notifications when the app is closed** — needs a background worker;
   out of scope for the timebox.
 
-## Running it locally
+## Running it
+
+### Quick option: live demo
+Visit https://smart-watchlist-by-samiksha.vercel.app - no setup needed.
+(Same free-tier sleep note as above applies.)
+
+### Running it locally
 
 ### Backend
 \`\`\`
