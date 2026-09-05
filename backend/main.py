@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import uuid
 from datetime import datetime, timezone
 
@@ -105,23 +106,39 @@ def get_watchlist(device_id: str = Query(...)):
             ).fetchall()
         }
 
-    items = []
     now_iso = datetime.now(timezone.utc).isoformat()
 
+    # Fetch every symbol's price CONCURRENTLY, including the index.
+    # Previously this was sequential (one fetch, wait, then the next), so
+    # latency scaled roughly linearly with watchlist size. Firing them off
+    # in parallel bounds latency to roughly the single slowest fetch
+    # instead of their sum.
+    all_symbols = symbols + [NIFTY_INDEX_SYMBOL]
+    prices: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=min(len(all_symbols), 16) or 1) as executor:
+        future_to_symbol = {
+            executor.submit(market_data.get_price, s): s for s in all_symbols
+        }
+        for future in as_completed(future_to_symbol):
+            sym = future_to_symbol[future]
+            try:
+                prices[sym] = future.result()
+            except Exception:
+                pass
+
     index_day_change_pct = None
-    try:
-        index_price = market_data.get_price(NIFTY_INDEX_SYMBOL)
-        if index_price.get("ltp") and index_price.get("prev_close"):
-            index_day_change_pct = round(
-                (index_price["ltp"] - index_price["prev_close"]) / index_price["prev_close"] * 100, 2
-            )
-    except Exception:
-        pass
+    index_price = prices.get(NIFTY_INDEX_SYMBOL)
+    if index_price and index_price.get("ltp") and index_price.get("prev_close"):
+        index_day_change_pct = round(
+            (index_price["ltp"] - index_price["prev_close"]) / index_price["prev_close"] * 100, 2
+        )
+
+    items = []
+    symbols_needing_news: list[str] = []
 
     for symbol in symbols:
-        try:
-            price = market_data.get_price(symbol)
-        except Exception:
+        price = prices.get(symbol)
+        if price is None:
             items.append({
                 "symbol": symbol,
                 "name": SYMBOL_INDEX[symbol]["name"],
@@ -140,12 +157,8 @@ def get_watchlist(device_id: str = Query(...)):
 
         diff = change_detection.compute_diff(price, last_seen_rows.get(symbol))
 
-        item_news = None
         if any(f["type"] in ("big_move", "gap") for f in flags):
-            try:
-                item_news = news.fetch_headline(symbol, SYMBOL_INDEX[symbol]["name"])
-            except Exception:
-                item_news = None
+            symbols_needing_news.append(symbol)
 
         items.append({
             "symbol": symbol,
@@ -165,7 +178,7 @@ def get_watchlist(device_id: str = Query(...)):
             "stale": price.get("stale", False),
             "flags": flags,
             "diff": diff,
-            "news": item_news,
+            "news": None,
         })
 
         with database.get_conn() as conn:
@@ -182,6 +195,24 @@ def get_watchlist(device_id: str = Query(...)):
                  price.get("day_low"), price.get("volume"), price.get("week52_high"),
                  price.get("week52_low"), now_iso),
             )
+
+    if symbols_needing_news:
+        news_results: dict[str, dict | None] = {}
+        with ThreadPoolExecutor(max_workers=min(len(symbols_needing_news), 8)) as executor:
+            future_to_symbol = {
+                executor.submit(news.fetch_headline, s, SYMBOL_INDEX[s]["name"]): s
+                for s in symbols_needing_news
+            }
+            for future in as_completed(future_to_symbol):
+                sym = future_to_symbol[future]
+                try:
+                    news_results[sym] = future.result()
+                except Exception:
+                    news_results[sym] = None
+
+        for item in items:
+            if item["symbol"] in news_results:
+                item["news"] = news_results[item["symbol"]]
 
     def sort_key(item):
         if item.get("error"):

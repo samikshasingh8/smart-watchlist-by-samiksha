@@ -80,6 +80,12 @@ def get_conn():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    # We now fetch multiple symbols concurrently (see main.py), which means
+    # multiple threads can attempt to write price_cache at nearly the same
+    # moment. SQLite allows only one writer at a time; without a busy
+    # timeout, a second writer fails immediately with "database is locked"
+    # instead of just waiting a beat for the first to finish.
+    conn.execute("PRAGMA busy_timeout = 5000")
     try:
         yield conn
         conn.commit()
