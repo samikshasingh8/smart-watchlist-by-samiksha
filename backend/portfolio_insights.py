@@ -4,9 +4,8 @@ Portfolio insight -- the honest version of
 
 Deliberately NOT prescriptive. This never says "buy X" or "you should
 diversify into Y" -- that edges into investment advice, which is legally
-loaded territory for a fintech (Groww is a SEBI-regulated broker). It
-only states facts about the watchlist that the user can act on however
-they want:
+loaded territory for a fintech. It only states facts about the watchlist 
+that the user can act on however they want:
 
   - sector concentration ("60% of your watchlist is Banking")
   - directional alignment ("6 of 8 moved the same direction today" --
