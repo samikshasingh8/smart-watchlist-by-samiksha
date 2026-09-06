@@ -10,6 +10,35 @@ attention right now.
 inactivity. If the app feels stuck or slow on your first click, give it
 30-50 seconds to wake up, that's expected, not a bug.)
 
+## Screenshots
+
+**Full watchlist — live prices, sparklines, and a quiet "nothing new" state**
+![Watchlist overview](screenshots/watchlist-overview.png)
+
+**Core feature: remembers what you saw last time, tells you what changed**
+![Diff pill](screenshots/watchlist-diff-pill.png)
+
+**Volume spike detection — flags unusual trading activity**
+![Volume spike flag](screenshots/watchlist-vol-spike-flag.png)
+
+**Volatility-relative flagging — catches a move that's small in absolute terms but unusual for that specific stock**
+![Unusual for this stock](screenshots/watchlist-unusual-stock.png)
+
+**52-week high/low detection**
+![52-week extreme flag](screenshots/watchlist-52week-extreme-flag.png)
+
+**Benchmark comparison — flags stocks moving differently from the Nifty 50**
+![Benchmark vs Nifty flag](screenshots/watchlist-benchmark-vs-nifty-flag.png)
+
+**Automatic news headline for a flagged stock — answers "why did this move?"**
+![News headline](screenshots/watchlist-news-headline.png)
+
+**Portfolio snapshot — sector concentration and correlation, without giving investment advice**
+![Portfolio insight](screenshots/watchlist-portfolio-insight.png)
+
+**Add-stock search with live prices, not just names**
+![Add stock panel](screenshots/watchlist-add-stocks-panel.png)
+
 ## The problem with a normal watchlist
 
 Every broker app shows you: symbol, price, today's % change. That's it. You
