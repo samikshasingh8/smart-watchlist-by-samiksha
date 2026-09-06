@@ -57,11 +57,11 @@ attention each stock deserves**, not by the order you added them.
 
 ## Architecture
 
-**Backend:** Python + FastAPI
-**Data:** SQLite (three tables, see below)
-**Market data:** yfinance (Yahoo Finance), NSE tickers via `.NS` suffix
-**Frontend:** React + Vite, no UI framework— hand-built dark ledger design
-**Identity:** an anonymous per-device UUID (see "State & identity" below)
+- **Backend:** Python + FastAPI
+- **Data:** SQLite (three tables, see below)
+- **Market data:** yfinance (Yahoo Finance), NSE tickers via `.NS` suffix
+- **Frontend:** React + Vite, no UI framework — hand-built dark ledger design
+- **Identity:** an anonymous per-device UUID (see "State & identity" below)
 
 ### The three tables that make the core feature work
 
