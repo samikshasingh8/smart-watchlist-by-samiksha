@@ -157,7 +157,8 @@ def build_digest(items: list[dict]) -> dict:
             parts.append(f"{len(week52_events)} at a 52-week extreme")
         remaining_flagged = len(flagged) - len(big_movers) - len(week52_events)
         if remaining_flagged > 0:
-            parts.append(f"{remaining_flagged} other flagged")
+            label = "other flagged" if parts else "flagged"
+            parts.append(f"{remaining_flagged} {label}")
         headline = ", ".join(parts) + " while you were away." if parts else \
             f"{len(moved)} stock{'s' if len(moved) != 1 else ''} moved since your last visit."
 

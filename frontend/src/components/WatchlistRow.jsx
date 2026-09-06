@@ -96,7 +96,7 @@ export default function WatchlistRow({ item, onRemove }) {
 
         {item.flags.map((f) => (
           <span key={f.type} className={`pill pill--${f.severity}`}>
-            {FLAG_LABELS[f.type] || f.type}
+            {f.message || FLAG_LABELS[f.type] || f.type}
           </span>
         ))}
 
